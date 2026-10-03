@@ -1,8 +1,3 @@
-<!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>War for the Crown</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -27,8 +22,6 @@
 }
 * { box-sizing: border-box; }
 html { background: var(--bg); }
-body { margin: 0; padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
-[hidden] { display: none !important; }
 body {
   background: var(--bg);
   color: var(--fg);
@@ -243,9 +236,6 @@ details.rules[open] summary::after { content: " –"; }
   * { animation: none !important; transition: none !important; }
 }
 </style>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-</head>
-<body>
 
 <canvas id="embers" aria-hidden="true"></canvas>
 <div class="glow" aria-hidden="true"></div>
@@ -384,12 +374,8 @@ details.rules[open] summary::after { content: " –"; }
 
 <script>
 (function () {
-  /* ---------- SUPABASE CONFIG: paste your project values here ---------- */
-  const SUPABASE_URL = "https://YOUR-PROJECT.supabase.co";
-  const SUPABASE_ANON_KEY = "YOUR-ANON-KEY";
-
   const $ = (id) => document.getElementById(id);
-  let db = null; // supabase client
+  let db = null;
   let canWrite = true;
   let players = [];   // {id, name, main, joinedAt}
   let matches = [];   // {id, p1, p2, r1, r2, ex1, ex2, stage, ts}
@@ -612,7 +598,7 @@ details.rules[open] summary::after { content: " –"; }
     const btn = $("lockBtn"); btn.disabled = true;
     const m = { p1: pick.a, p2: pick.b, r1: pick.r1, r2: pick.r2, ex1: $("ex1").checked, ex2: $("ex2").checked, stage: pick.stage, ts: Date.now() };
     try {
-      await must(db.from("matches").insert(m));
+      await db.collection("matches").add(m);
       const w = m.r1 > m.r2 ? nameOf(m.p1) : m.r2 > m.r1 ? nameOf(m.p2) : null;
       toast(m.stage === "final" ? `♛ ${w} is the champion!` : w ? `${w} wins ${Math.max(m.r1, m.r2)}-${Math.min(m.r1, m.r2)}` : "Draw locked in");
       resetPick();
@@ -630,13 +616,13 @@ details.rules[open] summary::after { content: " –"; }
       return;
     }
     armed = null;
-    try { await must(db.from("matches").delete().eq("id", b.dataset.del)); toast("Fight removed"); } catch (err) { handleWriteError(err); }
+    try { await db.collection("matches").doc(b.dataset.del).delete(); toast("Fight removed"); } catch (err) { handleWriteError(err); }
   });
 
   $("roster").addEventListener("click", async (e) => {
     const b = e.target.closest("[data-rm]"); if (!b || !db) return;
     if (!b.classList.contains("armed")) { b.classList.add("armed"); b.textContent = "Sure?"; return; }
-    try { await must(db.from("players").delete().eq("id", b.dataset.rm)); toast("Fighter removed"); } catch (err) { handleWriteError(err); }
+    try { await db.collection("players").doc(b.dataset.rm).delete(); toast("Fighter removed"); } catch (err) { handleWriteError(err); }
   });
 
   $("regForm").addEventListener("submit", async (e) => {
@@ -646,11 +632,11 @@ details.rules[open] summary::after { content: " –"; }
     const main = $("regMain").value.trim();
     if (!name) { msg.textContent = "Type a fighter name first."; msg.classList.add("err"); return; }
     if (players.some((p) => p.name.toUpperCase() === name)) { msg.textContent = `${name} is already registered. Pick another name.`; msg.classList.add("err"); return; }
-    if (!db) { msg.textContent = "Not connected to the arena yet. Check the Supabase keys at the top of the script."; msg.classList.add("err"); return; }
+    if (!db) { msg.textContent = "Not connected to the arena yet. Open this page signed in to claude.ai."; msg.classList.add("err"); return; }
     let id = slug(name);
     if (players.some((p) => p.id === id)) id += "-" + Date.now().toString(36);
     try {
-      await must(db.from("players").insert({ id, name, main, joined_at: Date.now() }));
+      await db.collection("players").doc(id).set({ name, main, joinedAt: Date.now() });
       $("regName").value = ""; $("regMain").value = "";
       msg.textContent = `${name} has entered the arena.`;
       toast(`${name} registered`);
@@ -660,44 +646,30 @@ details.rules[open] summary::after { content: " –"; }
   function handleWriteError(err, msgEl) {
     const code = err && err.code;
     let t = "That didn't save. Try again in a moment.";
-    if (code === "42501") t = "Supabase refused the write. Check the row-level security policies in schema.sql.";
-    else if (code === "23505") t = "That fighter is already registered.";
-    else if (code === "23503") t = "That fighter no longer exists. Refresh the page.";
+    if (code === "invalid_argument" || code === "not_granted") { t = "You don't have edit access. Ask the organizer to make you a Contributor."; canWrite = false; render(); }
+    else if (code === "quota_exceeded") t = "The arena's storage is full. Delete old fights.";
     if (msgEl) { msgEl.textContent = t; msgEl.classList.add("err"); } else toast(t);
   }
 
   /* ---------- boot ---------- */
-  async function must(q) { const { error } = await q; if (error) throw error; await refresh(); }
-  async function refresh() {
-    const [pr, mr] = await Promise.all([
-      db.from("players").select("*").order("joined_at"),
-      db.from("matches").select("*"),
-    ]);
-    if (pr.error || mr.error) { setStatus("Can't reach Supabase · " + (pr.error || mr.error).message, false); return; }
-    players = pr.data.map((p) => ({ id: p.id, name: p.name, main: p.main || "", joinedAt: p.joined_at }));
-    matches = mr.data.filter((m) => typeof m.r1 === "number" && typeof m.r2 === "number").map((m) => ({ ...m, ts: Number(m.ts) }));
-    render();
-  }
-  function setStatus(t, live) { $("status").textContent = t; $("status").classList.toggle("live", !!live); }
-
   render();
   (async () => {
-    if (!window.supabase || SUPABASE_URL.includes("YOUR-PROJECT")) {
-      setStatus("Not connected · add your Supabase URL and anon key in index.html", false);
-      canWrite = false; render(); return;
-    }
-    db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-    await refresh();
-    let pending = null;
-    const queue = () => { clearTimeout(pending); pending = setTimeout(refresh, 150); };
-    db.channel("arena")
-      .on("postgres_changes", { event: "*", schema: "public", table: "players" }, queue)
-      .on("postgres_changes", { event: "*", schema: "public", table: "matches" }, queue)
-      .subscribe((st) => {
-        if (st === "SUBSCRIBED") setStatus("Live · updates for everyone instantly", true);
-        else if (st === "CHANNEL_ERROR" || st === "TIMED_OUT") setStatus("Live updates paused · reload to reconnect", false);
-      });
-    document.addEventListener("visibilitychange", () => { if (!document.hidden) refresh(); });
+    const claude = window.claude;
+    if (!claude || !claude.use) { $("status").textContent = "Offline preview · open on claude.ai to play"; return; }
+    db = await claude.use("db");
+    if (!db) { $("status").textContent = "Sign in to claude.ai to see the live tournament"; canWrite = false; render(); return; }
+    const user = await claude.use("user");
+    if (user) { try { const c = await user.can("data.write"); if (c === false) canWrite = false; } catch (_) {} }
+    $("status").textContent = "Live · updates for everyone instantly";
+    $("status").classList.add("live");
+    db.collection("players").orderBy("joinedAt").onSnapshot((snap) => {
+      players = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+      render();
+    }, () => { $("status").textContent = "Connection lost · reload the page"; $("status").classList.remove("live"); });
+    db.collection("matches").onSnapshot((snap) => {
+      matches = snap.docs.map((d) => ({ id: d.id, ...d.data() })).filter((m) => typeof m.r1 === "number" && typeof m.r2 === "number");
+      render();
+    }, () => { $("status").textContent = "Connection lost · reload the page"; $("status").classList.remove("live"); });
   })();
 
   /* ---------- embers ---------- */
@@ -721,5 +693,3 @@ details.rules[open] summary::after { content: " –"; }
   tick();
 })();
 </script>
-</body>
-</html>
