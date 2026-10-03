@@ -223,6 +223,9 @@ input[type=password]::placeholder { color: #6e5658; }
 #loginUser { text-transform: none; }
 .whoami { margin: 12px 0 0; text-align: center; color: var(--muted); font-size: 14px; text-transform: uppercase; letter-spacing: .08em; }
 .linkbtn { background: none; border: none; padding: 0; color: var(--red); font-size: 14px; text-decoration: underline; }
+.danger { margin-top: 16px; padding-top: 12px; border-top: 1px dashed var(--line); }
+.danger-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 6px; }
+.danger-row button { flex: 1 1 160px; padding: 8px; }
 .footer { text-align: center; margin-top: 34px; font-family: var(--font-brush); font-size: clamp(20px, 4.5vw, 32px); transform: rotate(-1.5deg); }
 .footer span { color: var(--red); text-shadow: 0 0 18px rgba(255,31,61,.7); }
 .status { text-align: center; color: var(--muted); font-size: 13px; letter-spacing: .1em; text-transform: uppercase; margin-top: 10px; }
@@ -333,6 +336,14 @@ input[type=password]::placeholder { color: #6e5658; }
       <div class="presets" id="presets"></div>
       <p class="preview" id="preview"></p>
       <button type="button" class="lock" id="lockBtn" disabled>Lock it in</button>
+      <div class="danger">
+        <p class="picker-label">Reset the tournament</p>
+        <div class="danger-row">
+          <button type="button" class="mini" id="resetScores">Clear all results</button>
+          <button type="button" class="mini" id="resetAll">Clear results + fighters</button>
+        </div>
+        <p class="gate-text" id="resetHint">Tap a button twice to confirm. This can't be undone.</p>
+      </div>
       <p class="whoami">Signed in as organizer · <button type="button" class="linkbtn" id="logoutBtn">Sign out</button></p>
       </div>
     </section>
@@ -374,7 +385,6 @@ input[type=password]::placeholder { color: #6e5658; }
           <ul>
             <li>Win: +3 · Draw: +1 each · Loss: 0</li>
             <li>Perfect victory (3-0): +1</li>
-            <li>Perfect loss (0-3): +1</li>
             <li>Excellent performance: +1 (organizers decide)</li>
           </ul>
         </div>
@@ -435,8 +445,8 @@ input[type=password]::placeholder { color: #6e5658; }
     // returns [points1, points2, bonus1, bonus2]
     let p1 = 0, p2 = 0, b1 = 0, b2 = 0;
     if (m.r1 > m.r2) p1 = 3; else if (m.r2 > m.r1) p2 = 3; else { p1 = 1; p2 = 1; }
-    if (m.r1 === 3 && m.r2 === 0) { b1++; b2++; }
-    if (m.r2 === 3 && m.r1 === 0) { b2++; b1++; }
+    if (m.r1 === 3 && m.r2 === 0) b1++; // perfect victory
+    if (m.r2 === 3 && m.r1 === 0) b2++;
     if (m.ex1) b1++;
     if (m.ex2) b2++;
     return [p1 + b1, p2 + b2, b1, b2];
@@ -725,6 +735,30 @@ input[type=password]::placeholder { color: #6e5658; }
     $("loginPass").value = "";
     toast("Welcome, organizer");
   });
+  let resetArmed = null, resetTimer;
+  async function doReset(which, btn) {
+    if (!db || !canWrite) return;
+    if (resetArmed !== which) {
+      resetArmed = which;
+      document.querySelectorAll(".danger-row button").forEach((x) => x.classList.remove("armed"));
+      btn.classList.add("armed");
+      $("resetHint").textContent = which === "all" ? "Tap again to delete every result AND every fighter." : "Tap again to delete every result. Fighters stay registered.";
+      clearTimeout(resetTimer);
+      resetTimer = setTimeout(() => { resetArmed = null; btn.classList.remove("armed"); $("resetHint").textContent = "Tap a button twice to confirm. This can't be undone."; }, 4000);
+      return;
+    }
+    clearTimeout(resetTimer); resetArmed = null; btn.classList.remove("armed");
+    try {
+      await must(db.from("matches").delete().not("id", "is", null));
+      if (which === "all") await must(db.from("players").delete().not("id", "is", null));
+      resetPick();
+      toast(which === "all" ? "Tournament wiped. Fresh start." : "All results cleared");
+    } catch (err) { handleWriteError(err); }
+    $("resetHint").textContent = "Tap a button twice to confirm. This can't be undone.";
+  }
+  $("resetScores").addEventListener("click", (e) => doReset("scores", e.currentTarget));
+  $("resetAll").addEventListener("click", (e) => doReset("all", e.currentTarget));
+
   $("logoutBtn").addEventListener("click", async () => { if (db) await db.auth.signOut(); toast("Signed out"); });
 
   render();
