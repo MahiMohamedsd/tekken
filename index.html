@@ -226,6 +226,59 @@ input[type=password]::placeholder { color: #6e5658; }
 .danger { margin-top: 16px; padding-top: 12px; border-top: 1px dashed var(--line); }
 .danger-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 6px; }
 .danger-row button { flex: 1 1 160px; padding: 8px; }
+.draft { margin-top: 18px; }
+.draft-bar { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+.draft-modes { margin: 0; grid-auto-flow: column; grid-template-columns: none; }
+.draft-modes button { padding: 9px 16px; }
+.draft-slots { display: flex; gap: 6px; }
+.slot { width: 54px; height: 70px; border: 1px dashed var(--line); position: relative; overflow: hidden; background: rgba(7,5,10,.6); display: grid; place-items: center; color: var(--muted); font-family: var(--font-num); font-size: 22px; }
+.slot.ban { border-color: var(--red-deep); }
+.slot.ban::after { content: "BAN"; position: absolute; bottom: 0; left: 0; right: 0; background: var(--red); color: #fff; font: 800 10px var(--font-body); letter-spacing: .14em; text-align: center; padding: 1px 0; }
+.slot .ph { position: absolute; inset: 0; }
+.champ-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(98px, 1fr)); gap: 8px; }
+.ctile {
+  position: relative; aspect-ratio: 3 / 4; max-width: 100%; padding: 0; overflow: hidden; border: 1px solid var(--line);
+  text-transform: none; letter-spacing: 0; background: var(--panel-2);
+}
+.ctile:hover { border-color: var(--red); transform: translateY(-2px); }
+.ph {
+  position: absolute; inset: 0; display: grid; place-items: center;
+  background: radial-gradient(90% 70% at 50% 25%, hsl(var(--h) 70% 32%), hsl(var(--h) 60% 9%) 75%);
+}
+.ph b { font-family: var(--font-brush); font-weight: 400; font-size: 34px; color: hsl(var(--h) 90% 82%); text-shadow: 0 0 18px hsl(var(--h) 90% 50% / .7), 2px 2px 0 #000; transform: rotate(-6deg); }
+.ph img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: top center; }
+.ctile .cname {
+  position: absolute; left: 0; right: 0; bottom: 0; padding: 14px 4px 5px; text-align: center;
+  background: linear-gradient(transparent, rgba(0,0,0,.92) 55%); color: #fff;
+  font: 800 14px/1 var(--font-body); text-transform: uppercase; letter-spacing: .05em;
+}
+.ctile .who { position: absolute; top: 4px; left: 4px; right: 4px; display: flex; flex-wrap: wrap; gap: 3px; }
+.ctile .who span { background: rgba(0,0,0,.75); color: var(--gold); font: 700 10px/1 var(--font-body); padding: 3px 4px; letter-spacing: .06em; }
+.ctile.sel { border: 2px solid var(--red); box-shadow: 0 0 18px rgba(255,31,61,.7); }
+.ctile .num { position: absolute; top: 4px; right: 4px; width: 24px; height: 24px; border-radius: 50%; background: var(--red); color: #fff; font: 600 18px/26px var(--font-num); text-align: center; box-shadow: 0 0 10px var(--red); }
+.ctile.banned .ph { filter: grayscale(1) brightness(.35); }
+.ctile.banned::after {
+  content: "BANNED"; position: absolute; top: 42%; left: -10%; right: -10%; transform: rotate(-18deg);
+  background: var(--red); color: #fff; font: 800 13px var(--font-body); letter-spacing: .2em; text-align: center; padding: 3px 0; box-shadow: 0 0 14px var(--red);
+}
+.ctile.banmark { border: 2px solid #fff; box-shadow: 0 0 18px rgba(255,255,255,.5); }
+.ctile.banmark .ph { filter: grayscale(.6) brightness(.6); }
+.ctile.banmark .num { background: #fff; color: var(--red-deep); box-shadow: none; }
+.ctile:disabled { opacity: 1; cursor: not-allowed; transform: none; }
+.draft-actions { margin-top: 14px; display: grid; gap: 8px; }
+.draft-actions .mini { justify-self: center; }
+.draft-summary { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 8px; margin-top: 16px; }
+.dsum { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border: 1px solid var(--line); background: rgba(7,5,10,.55); min-width: 0; }
+.dsum b { font-size: 18px; text-transform: uppercase; letter-spacing: .05em; min-width: 64px; }
+.thumbs { display: flex; gap: 4px; align-items: center; flex-wrap: wrap; }
+.thumb { position: relative; width: 30px; height: 38px; overflow: hidden; border: 1px solid var(--line); flex: none; }
+.thumb .ph b { font-size: 13px; }
+.thumb.x { border-color: var(--red); }
+.thumb.x::after { content: ""; position: absolute; inset: 0; background: linear-gradient(45deg, transparent 45%, var(--red) 45% 55%, transparent 55%); }
+.thumb.dead .ph { filter: grayscale(1) brightness(.4); }
+.dsum .none { color: var(--muted); font-size: 14px; text-transform: uppercase; letter-spacing: .06em; }
+.lb td.name .thumbs { margin-top: 4px; }
+.lb td.name .thumb { width: 24px; height: 30px; }
 .footer { text-align: center; margin-top: 34px; font-family: var(--font-brush); font-size: clamp(20px, 4.5vw, 32px); transform: rotate(-1.5deg); }
 .footer span { color: var(--red); text-shadow: 0 0 18px rgba(255,31,61,.7); }
 .status { text-align: center; color: var(--muted); font-size: 13px; letter-spacing: .1em; text-transform: uppercase; margin-top: 10px; }
@@ -376,6 +429,33 @@ input[type=password]::placeholder { color: #6e5658; }
     <div class="roster" id="roster"></div>
   </section>
 
+  <section class="panel draft" id="draft" aria-labelledby="draftTitle">
+    <h2 id="draftTitle">Champion <em>select</em></h2>
+    <p class="sub" id="draftSub">Each fighter picks 3 champions and bans 1. Banned champions can't be picked by anyone.</p>
+
+    <p class="picker-label">Drafting for</p>
+    <div class="chips" id="draftWho"></div>
+
+    <div class="draft-bar">
+      <div class="stage-toggle draft-modes" role="group" aria-label="Draft mode">
+        <button type="button" id="modePick" class="on">Pick 3</button>
+        <button type="button" id="modeBan">Ban 1</button>
+        <button type="button" id="modeOrg" hidden>Organizer bans</button>
+      </div>
+      <div class="draft-slots" id="draftSlots"></div>
+    </div>
+
+    <div class="champ-grid" id="champGrid"></div>
+
+    <div class="draft-actions">
+      <p class="preview" id="draftMsg"></p>
+      <button type="button" class="lock" id="draftSave" disabled>Lock in champions</button>
+      <button type="button" class="mini" id="draftLock" hidden>Lock the draft</button>
+    </div>
+
+    <div class="draft-summary" id="draftSummary"></div>
+  </section>
+
   <section class="panel">
     <details class="rules">
       <summary>Official rules</summary>
@@ -400,7 +480,8 @@ input[type=password]::placeholder { color: #6e5658; }
         <div>
           <h3>Match rules</h3>
           <ul>
-            <li>60-second rounds, any character</li>
+            <li>60-second rounds</li>
+            <li>Each fighter picks 3 champions and bans 1</li>
             <li>Can't play? Forfeit counts as a 0-3 loss, 0 points</li>
             <li>No lag switch, no mods, no third-party tools</li>
             <li>Respect. Victory is earned, not given.</li>
@@ -426,6 +507,29 @@ input[type=password]::placeholder { color: #6e5658; }
   let db = null; // supabase client
   let canWrite = false; // true only while the organizer is signed in
   const ADMIN_EMAIL_DOMAIN = "tekken.local"; // username "admin123" signs in as admin123@tekken.local
+  /* ---------- CHAMPIONS: add/remove names here; drop pictures in img/champions/<slug>.webp|png|jpg ---------- */
+  const CHAMPION_IMG_DIR = "img/champions/";
+  const CHAMPIONS = ["Alisa", "Anna", "Armor King", "Asuka", "Azucena", "Bryan", "Claudio", "Clive", "Devil Jin", "Dragunov",
+    "Eddy", "Fahkumram", "Feng", "Heihachi", "Hwoarang", "Jack-8", "Jin", "Jun", "Kazuya", "King", "Kuma", "Lars", "Law",
+    "Lee", "Leo", "Leroy", "Lidia", "Lili", "Miary Zo", "Nina", "Panda", "Paul", "Raven", "Reina", "Shaheen", "Steve",
+    "Victor", "Xiaoyu", "Yoshimitsu", "Zafina"].map((name) => ({ name, slug: name.toLowerCase().replace(/[^a-z0-9]+/g, "-") }));
+  const champBySlug = Object.fromEntries(CHAMPIONS.map((c) => [c.slug, c]));
+  const IMG_EXTS = ["webp", "png", "jpg"];
+  window.__nextImg = (img) => {
+    const i = +img.dataset.i + 1;
+    if (i >= IMG_EXTS.length) { img.remove(); return; }
+    img.dataset.i = i; img.src = CHAMPION_IMG_DIR + img.dataset.slug + "." + IMG_EXTS[i];
+  };
+  function portrait(slug) {
+    const c = champBySlug[slug]; if (!c) return "";
+    let h = 0; for (const ch of slug) h = (h * 31 + ch.charCodeAt(0)) % 360;
+    const mono = c.name.split(/[\s-]+/).map((w) => w[0]).join("").slice(0, 2).toUpperCase();
+    return `<span class="ph" style="--h:${h}"><b>${mono}</b><img alt="" loading="lazy" data-slug="${slug}" data-i="0" src="${CHAMPION_IMG_DIR}${slug}.${IMG_EXTS[0]}" onerror="__nextImg(this)"></span>`;
+  }
+  let drafts = {};    // player_id -> {picks: [], ban}
+  let settings = { bans: [], draft_locked: false };
+  const dsel = { player: null, mode: "pick", picks: [], ban: null, org: [] };
+
   let players = [];   // {id, name, main, joinedAt}
   let matches = [];   // {id, p1, p2, r1, r2, ex1, ex2, stage, ts}
   const pick = { a: null, b: null, r1: null, r2: null, stage: "group" };
@@ -506,7 +610,7 @@ input[type=password]::placeholder { color: #6e5658; }
       lb.innerHTML = table.map((r, i) => `
         <tr class="${i === 0 ? "top1" : i === 1 ? "top2" : ""} ${groupDone && i < 2 ? "finalist" : ""}">
           <td><span class="rank">${i + 1}</span></td>
-          <td class="name">${esc(r.name)}${r.main ? `<small>${esc(r.main)}</small>` : ""}</td>
+          <td class="name">${esc(r.name)}${(drafts[r.id]?.picks || []).length ? `<div class="thumbs">${drafts[r.id].picks.map((c) => `<span class="thumb" title="${esc(champBySlug[c]?.name || c)}">${portrait(c)}</span>`).join("")}</div>` : r.main ? `<small>${esc(r.main)}</small>` : ""}</td>
           <td class="pts">${r.played ? r.pts : "–"}</td>
           <td>${r.played ? `${r.w}-${r.l}-${r.d}` : "–"}</td>
           <td>${r.played ? `${r.rw}<span style="color:var(--muted)">/${r.rl}</span>` : "–"}</td>
@@ -560,6 +664,8 @@ input[type=password]::placeholder { color: #6e5658; }
       const used = matches.some((m) => m.p1 === p.id || m.p2 === p.id);
       return `<div class="fighter"><div><b>${esc(p.name)}</b>${p.main ? ` <small>${esc(p.main)}</small>` : ""}</div>${canWrite && !used ? `<button type="button" class="mini" data-rm="${p.id}" aria-label="Remove ${esc(p.name)}">✕</button>` : ""}</div>`;
     }).join("") : "";
+
+    renderDraft();
 
     // auto-suggest final pairing
     if (pick.stage === "final" && groupDone && !pick.a && !pick.b && table.length >= 2) {
@@ -700,6 +806,144 @@ input[type=password]::placeholder { color: #6e5658; }
     if (msgEl) { msgEl.textContent = t; msgEl.classList.add("err"); } else toast(t);
   }
 
+  /* ---------- champion select ---------- */
+  function bannedMap() {
+    const m = {};
+    (settings.bans || []).forEach((c) => (m[c] = ["ORGANIZER"]));
+    Object.entries(drafts).forEach(([pid, d]) => { if (d.ban) (m[d.ban] = m[d.ban] || []).push(nameOf(pid)); });
+    return m;
+  }
+  // bans on a champion, ignoring the fighter currently drafting (their own ban lives in dsel.ban)
+  function bannedByOthers(banned, slug) {
+    const me = dsel.player && dsel.mode !== "org" ? nameOf(dsel.player) : null;
+    return (banned[slug] || []).filter((n) => n !== me);
+  }
+  function loadDraftFor(pid) {
+    dsel.player = pid;
+    const d = drafts[pid] || {};
+    dsel.picks = [...(d.picks || [])]; dsel.ban = d.ban || null;
+    dsel.mode = dsel.picks.length < 3 ? "pick" : "ban";
+  }
+  const draftOpen = () => canWrite || !settings.draft_locked;
+
+  function renderDraft() {
+    if (!players.some((p) => p.id === dsel.player)) dsel.player = null;
+    if (dsel.mode === "org" && !canWrite) dsel.mode = "pick";
+    const banned = bannedMap();
+    const pickedBy = {};
+    Object.entries(drafts).forEach(([pid, d]) => (d.picks || []).forEach((c) => (pickedBy[c] = pickedBy[c] || []).push(nameOf(pid))));
+
+    $("draftWho").innerHTML = players.map((p) =>
+      `<button type="button" class="chip ${dsel.player === p.id ? "on" : ""}" data-dp="${p.id}">${esc(p.name)}</button>`).join("")
+      || '<span style="color:var(--muted)">Register a fighter first.</span>';
+    $("modePick").classList.toggle("on", dsel.mode === "pick");
+    $("modeBan").classList.toggle("on", dsel.mode === "ban");
+    $("modeOrg").classList.toggle("on", dsel.mode === "org");
+    $("modeOrg").hidden = !canWrite;
+    $("draftLock").hidden = !canWrite;
+    $("draftLock").textContent = settings.draft_locked ? "Unlock the draft" : "Lock the draft";
+    $("draftSub").textContent = settings.draft_locked
+      ? "The draft is locked. Picks and bans are final."
+      : "Each fighter picks 3 champions and bans 1. Banned champions can't be picked by anyone.";
+
+    const org = dsel.mode === "org";
+    const slots = org ? dsel.org.slice(0, 6).map((c) => `<div class="slot ban">${portrait(c)}</div>`).join("")
+      : [0, 1, 2].map((i) => `<div class="slot">${dsel.picks[i] ? portrait(dsel.picks[i]) : i + 1}</div>`).join("")
+        + `<div class="slot ban">${dsel.ban ? portrait(dsel.ban) : ""}</div>`;
+    $("draftSlots").innerHTML = (dsel.player || org) ? slots : "";
+
+    $("champGrid").innerHTML = CHAMPIONS.map((c) => {
+      const others = bannedByOthers(banned, c.slug);
+      let cls = "", num = "", disabled = false;
+      if (org) {
+        if (dsel.org.includes(c.slug)) { cls = "banmark"; num = "✕"; }
+      } else if (dsel.player) {
+        const pi = dsel.picks.indexOf(c.slug);
+        if (pi >= 0) { cls = "sel"; num = pi + 1; }
+        if (dsel.ban === c.slug) { cls = "banmark"; num = "✕"; }
+        const blockedForPick = others.length > 0;
+        if (cls !== "sel" && cls !== "banmark" && blockedForPick) { cls = "banned"; disabled = true; }
+        if (!draftOpen()) disabled = true;
+      } else if (banned[c.slug]) cls = "banned";
+      const tags = cls === "banned" ? banned[c.slug].map((n) => "✕ " + n) : (pickedBy[c.slug] || []);
+      return `<button type="button" class="ctile ${cls}" data-c="${c.slug}" ${disabled || (!dsel.player && !org) ? "disabled" : ""} aria-pressed="${cls === "sel" || cls === "banmark"}">
+        ${portrait(c.slug)}
+        ${tags.length ? `<span class="who">${tags.slice(0, 4).map((t) => `<span>${esc(t)}</span>`).join("")}</span>` : ""}
+        ${num !== "" ? `<span class="num">${num}</span>` : ""}
+        <span class="cname">${esc(c.name)}</span>
+      </button>`;
+    }).join("");
+
+    // message + save
+    let msg = "", ok = false;
+    if (org) { msg = `${dsel.org.length} champion${dsel.org.length === 1 ? "" : "s"} banned by the organizer`; ok = canWrite; }
+    else if (!dsel.player) msg = "Tap your name to start your draft";
+    else if (!draftOpen()) msg = "The draft is locked";
+    else if (dsel.picks.some((c) => bannedByOthers(banned, c).length)) msg = `${champBySlug[dsel.picks.find((c) => bannedByOthers(banned, c).length)].name} is banned. Tap it to drop it and pick another.`;
+    else if (dsel.picks.length < 3) msg = `${nameOf(dsel.player)}: pick ${3 - dsel.picks.length} more champion${dsel.picks.length === 2 ? "" : "s"}`;
+    else if (!dsel.ban) msg = `${nameOf(dsel.player)}: now ban 1 champion`;
+    else { msg = `${nameOf(dsel.player)} is ready`; ok = true; }
+    $("draftMsg").textContent = msg;
+    $("draftSave").disabled = !ok || !db;
+    $("draftSave").textContent = org ? "Save organizer bans" : "Lock in champions";
+
+    // summary
+    $("draftSummary").innerHTML = players.map((p) => {
+      const d = drafts[p.id];
+      if (!d || (!(d.picks || []).length && !d.ban)) return `<div class="dsum"><b>${esc(p.name)}</b><span class="none">No picks yet</span></div>`;
+      const othersBan = (c) => (banned[c] || []).some((n) => n !== p.name) ;
+      return `<div class="dsum"><b>${esc(p.name)}</b><div class="thumbs">
+        ${(d.picks || []).map((c) => `<span class="thumb ${othersBan(c) ? "dead" : ""}" title="${esc(champBySlug[c]?.name || c)}${othersBan(c) ? " (banned, repick)" : ""}">${portrait(c)}</span>`).join("")}
+        ${d.ban ? `<span class="thumb x" title="Bans ${esc(champBySlug[d.ban]?.name || d.ban)}">${portrait(d.ban)}</span>` : ""}
+      </div></div>`;
+    }).join("");
+  }
+
+  $("draftWho").addEventListener("click", (e) => {
+    const id = e.target.closest("[data-dp]")?.dataset.dp; if (!id) return;
+    if (dsel.mode === "org") dsel.mode = "pick";
+    loadDraftFor(id); renderDraft();
+  });
+  $("modePick").addEventListener("click", () => { dsel.mode = "pick"; renderDraft(); });
+  $("modeBan").addEventListener("click", () => { dsel.mode = "ban"; renderDraft(); });
+  $("modeOrg").addEventListener("click", () => { dsel.mode = "org"; dsel.org = [...(settings.bans || [])]; renderDraft(); });
+  $("champGrid").addEventListener("click", (e) => {
+    const c = e.target.closest("[data-c]")?.dataset.c; if (!c) return;
+    if (dsel.mode === "org") {
+      dsel.org = dsel.org.includes(c) ? dsel.org.filter((x) => x !== c) : [...dsel.org, c];
+    } else if (dsel.player) {
+      if (dsel.picks.includes(c)) { dsel.picks = dsel.picks.filter((x) => x !== c); dsel.mode = "pick"; }
+      else if (dsel.ban === c) dsel.ban = null;
+      else if (dsel.mode === "ban") dsel.ban = c;
+      else if (dsel.picks.length < 3) dsel.picks.push(c);
+      else { toast("You already have 3. Tap one to drop it."); return; }
+      if (dsel.mode === "pick" && dsel.picks.length === 3 && !dsel.ban) dsel.mode = "ban";
+    }
+    renderDraft();
+  });
+  $("draftSave").addEventListener("click", async () => {
+    if (!db) return;
+    $("draftSave").disabled = true;
+    try {
+      if (dsel.mode === "org") {
+        await must(db.from("settings").upsert({ id: "main", bans: dsel.org, draft_locked: !!settings.draft_locked }));
+        toast("Organizer bans saved");
+      } else {
+        await must(db.from("drafts").upsert({ player_id: dsel.player, picks: dsel.picks, ban: dsel.ban, updated_at: Date.now() }));
+        toast(`${nameOf(dsel.player)} locked in`);
+        dsel.player = null;
+      }
+    } catch (err) { handleWriteError(err); }
+    renderDraft();
+  });
+  $("draftLock").addEventListener("click", async () => {
+    if (!db || !canWrite) return;
+    try {
+      await must(db.from("settings").upsert({ id: "main", bans: settings.bans || [], draft_locked: !settings.draft_locked }));
+      toast(settings.draft_locked ? "Draft locked" : "Draft unlocked");
+    } catch (err) { handleWriteError(err); }
+  });
+
   /* ---------- boot ---------- */
   async function must(q) { const { error } = await q; if (error) throw error; await refresh(); }
   async function refresh() {
@@ -710,6 +954,11 @@ input[type=password]::placeholder { color: #6e5658; }
     if (pr.error || mr.error) { setStatus("Can't reach Supabase · " + (pr.error || mr.error).message, false); return; }
     players = pr.data.map((p) => ({ id: p.id, name: p.name, main: p.main || "", joinedAt: p.joined_at }));
     matches = mr.data.filter((m) => typeof m.r1 === "number" && typeof m.r2 === "number").map((m) => ({ ...m, ts: Number(m.ts) }));
+    const [dr, sr] = await Promise.all([db.from("drafts").select("*"), db.from("settings").select("*").eq("id", "main")]);
+    drafts = {};
+    if (!dr.error) dr.data.forEach((d) => (drafts[d.player_id] = { picks: (d.picks || []).filter((c) => champBySlug[c]), ban: champBySlug[d.ban] ? d.ban : null }));
+    settings = (!sr.error && sr.data[0]) ? { bans: (sr.data[0].bans || []).filter((c) => champBySlug[c]), draft_locked: !!sr.data[0].draft_locked } : { bans: [], draft_locked: false };
+    if (dr.error || sr.error) $("draftSub").textContent = "Run draft.sql in Supabase to turn on champion select.";
     render();
   }
   function setStatus(t, live) { $("status").textContent = t; $("status").classList.toggle("live", !!live); }
@@ -750,7 +999,10 @@ input[type=password]::placeholder { color: #6e5658; }
     clearTimeout(resetTimer); resetArmed = null; btn.classList.remove("armed");
     try {
       await must(db.from("matches").delete().not("id", "is", null));
-      if (which === "all") await must(db.from("players").delete().not("id", "is", null));
+      if (which === "all") {
+        await must(db.from("players").delete().not("id", "is", null));
+        await db.from("settings").upsert({ id: "main", bans: [], draft_locked: false }); await refresh();
+      }
       resetPick();
       toast(which === "all" ? "Tournament wiped. Fresh start." : "All results cleared");
     } catch (err) { handleWriteError(err); }
@@ -777,6 +1029,8 @@ input[type=password]::placeholder { color: #6e5658; }
     db.channel("arena")
       .on("postgres_changes", { event: "*", schema: "public", table: "players" }, queue)
       .on("postgres_changes", { event: "*", schema: "public", table: "matches" }, queue)
+      .on("postgres_changes", { event: "*", schema: "public", table: "drafts" }, queue)
+      .on("postgres_changes", { event: "*", schema: "public", table: "settings" }, queue)
       .subscribe((st) => {
         if (st === "SUBSCRIBED") setStatus("Live · updates for everyone instantly", true);
         else if (st === "CHANNEL_ERROR" || st === "TIMED_OUT") setStatus("Live updates paused · reload to reconnect", false);

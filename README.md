@@ -28,3 +28,12 @@ Only the organizer can record or delete results. Anyone can still view the stand
 Optional: turn off **Authentication → Sign In / Providers → Allow new users to sign up** so nobody else can create accounts. Other accounts can't record results anyway, because the policies only accept `admin123@tekken.local`.
 
 `claude-artifact.html` is the original claude.ai artifact version, which stores data in the artifact instead of Supabase.
+
+## Champion select (picks and bans)
+
+1. In Supabase, open **SQL Editor**, paste `draft.sql`, and run it.
+2. On the page, each fighter taps their name under **Champion select**, picks 3 champions, then bans 1.
+3. A champion banned by anyone can't be picked. Picks that get banned later are greyed out until the fighter swaps them.
+4. The signed-in organizer can add extra bans (**Organizer bans**) and **Lock the draft** so picks become final.
+
+Champion pictures go in `img/champions/` (see the README there). Champions without a picture get a styled monogram card.
