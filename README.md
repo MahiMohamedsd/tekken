@@ -14,6 +14,17 @@ Register fighters, record match scores, and follow a live leaderboard that uses 
    ```
 5. Host `index.html` anywhere static: GitHub Pages, Netlify Drop, or Vercel. Opening it locally also works.
 
-The anon key is meant to be public. Anyone with the page link can add and delete scores, so only share it with the people in the tournament.
+## Organizer login
+
+Only the organizer can record or delete results. Anyone can still view the standings and register a fighter.
+
+1. In Supabase, open **SQL Editor**, paste `admin.sql`, and run it.
+2. Open **Authentication → Users → Add user → Create new user**:
+   - Email: `admin123@tekken.local`
+   - Password: the organizer password
+   - Tick **Auto Confirm User**
+3. On the page, sign in with username `admin123` and that password. The page adds `@tekken.local` for you.
+
+Optional: turn off **Authentication → Sign In / Providers → Allow new users to sign up** so nobody else can create accounts. Other accounts can't record results anyway, because the policies only accept `admin123@tekken.local`.
 
 `claude-artifact.html` is the original claude.ai artifact version, which stores data in the artifact instead of Supabase.

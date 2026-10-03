@@ -212,6 +212,17 @@ details.rules[open] summary::after { content: " –"; }
 .rules-grid li { margin-bottom: 4px; }
 .rules-grid li::marker { color: var(--red); }
 
+.gate { display: grid; gap: 10px; padding: 16px; border: 1px dashed var(--red-deep); background: rgba(7,5,10,.6); }
+.gate-title { margin: 0; font-family: var(--font-brush); font-size: 22px; color: var(--red); }
+.gate-text { margin: 0 0 4px; color: var(--muted); font-size: 15px; text-transform: uppercase; letter-spacing: .06em; }
+input[type=password] {
+  font-family: var(--font-body); font-size: 19px; font-weight: 700; letter-spacing: .05em;
+  background: rgba(7,5,10,.8); color: var(--fg); border: 1px solid var(--line); padding: 11px 12px; min-width: 0; width: 100%;
+}
+input[type=password]::placeholder { color: #6e5658; }
+#loginUser { text-transform: none; }
+.whoami { margin: 12px 0 0; text-align: center; color: var(--muted); font-size: 14px; text-transform: uppercase; letter-spacing: .08em; }
+.linkbtn { background: none; border: none; padding: 0; color: var(--red); font-size: 14px; text-decoration: underline; }
 .footer { text-align: center; margin-top: 34px; font-family: var(--font-brush); font-size: clamp(20px, 4.5vw, 32px); transform: rotate(-1.5deg); }
 .footer span { color: var(--red); text-shadow: 0 0 18px rgba(255,31,61,.7); }
 .status { text-align: center; color: var(--muted); font-size: 13px; letter-spacing: .1em; text-transform: uppercase; margin-top: 10px; }
@@ -284,7 +295,18 @@ details.rules[open] summary::after { content: " –"; }
 
     <section class="panel" id="recordPanel" aria-labelledby="recTitle">
       <h2 id="recTitle">Record a <em>match</em></h2>
-      <p class="sub">Tap two fighters, tap the rounds, lock it in</p>
+      <p class="sub" id="recSub">Tap two fighters, tap the rounds, lock it in</p>
+
+      <form class="gate" id="loginForm" autocomplete="on">
+        <p class="gate-title">Organizer only</p>
+        <p class="gate-text">Sign in as the organizer to record results.</p>
+        <input type="text" id="loginUser" name="username" autocomplete="username" placeholder="Username" aria-label="Username" required>
+        <input type="password" id="loginPass" name="password" autocomplete="current-password" placeholder="Password" aria-label="Password" required>
+        <button type="submit" class="lock" id="loginBtn">Sign in</button>
+        <p class="msg" id="loginMsg"></p>
+      </form>
+
+      <div id="recBody" hidden>
 
       <div class="stage-toggle" role="group" aria-label="Stage">
         <button type="button" id="stGroup" class="on">Group stage</button>
@@ -311,6 +333,8 @@ details.rules[open] summary::after { content: " –"; }
       <div class="presets" id="presets"></div>
       <p class="preview" id="preview"></p>
       <button type="button" class="lock" id="lockBtn" disabled>Lock it in</button>
+      <p class="whoami">Signed in as organizer · <button type="button" class="linkbtn" id="logoutBtn">Sign out</button></p>
+      </div>
     </section>
   </div>
 
@@ -390,7 +414,8 @@ details.rules[open] summary::after { content: " –"; }
 
   const $ = (id) => document.getElementById(id);
   let db = null; // supabase client
-  let canWrite = true;
+  let canWrite = false; // true only while the organizer is signed in
+  const ADMIN_EMAIL_DOMAIN = "tekken.local"; // username "admin123" signs in as admin123@tekken.local
   let players = [];   // {id, name, main, joinedAt}
   let matches = [];   // {id, p1, p2, r1, r2, ex1, ex2, stage, ts}
   const pick = { a: null, b: null, r1: null, r2: null, stage: "group" };
@@ -558,8 +583,7 @@ details.rules[open] summary::after { content: " –"; }
       else if (pick.stage === "final" && pick.r1 === pick.r2) err = "The final needs a winner.";
     }
     const pv = $("preview");
-    if (!canWrite) pv.textContent = "You can view the standings. Ask the organizer for edit access to record fights.";
-    else if (err) pv.textContent = err;
+    if (err) pv.textContent = err;
     else if (ready) {
       const [x, y] = matchPoints({ r1: pick.r1, r2: pick.r2, ex1: $("ex1").checked, ex2: $("ex2").checked });
       pv.textContent = pick.stage === "final"
@@ -660,7 +684,7 @@ details.rules[open] summary::after { content: " –"; }
   function handleWriteError(err, msgEl) {
     const code = err && err.code;
     let t = "That didn't save. Try again in a moment.";
-    if (code === "42501") t = "Supabase refused the write. Check the row-level security policies in schema.sql.";
+    if (code === "42501") t = "Only the signed-in organizer can do that.";
     else if (code === "23505") t = "That fighter is already registered.";
     else if (code === "23503") t = "That fighter no longer exists. Refresh the page.";
     if (msgEl) { msgEl.textContent = t; msgEl.classList.add("err"); } else toast(t);
@@ -680,6 +704,29 @@ details.rules[open] summary::after { content: " –"; }
   }
   function setStatus(t, live) { $("status").textContent = t; $("status").classList.toggle("live", !!live); }
 
+  function applySession(session) {
+    canWrite = !!session;
+    $("loginForm").hidden = canWrite;
+    $("recBody").hidden = !canWrite;
+    $("recSub").textContent = canWrite ? "Tap two fighters, tap the rounds, lock it in" : "Results are entered by the organizer";
+    render();
+  }
+
+  $("loginForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const msg = $("loginMsg"); msg.className = "msg"; msg.textContent = "";
+    if (!db) { msg.textContent = "Not connected to Supabase yet."; msg.classList.add("err"); return; }
+    let user = $("loginUser").value.trim().toLowerCase();
+    if (!user.includes("@")) user += "@" + ADMIN_EMAIL_DOMAIN;
+    $("loginBtn").disabled = true;
+    const { error } = await db.auth.signInWithPassword({ email: user, password: $("loginPass").value });
+    $("loginBtn").disabled = false;
+    if (error) { msg.textContent = "Wrong username or password."; msg.classList.add("err"); return; }
+    $("loginPass").value = "";
+    toast("Welcome, organizer");
+  });
+  $("logoutBtn").addEventListener("click", async () => { if (db) await db.auth.signOut(); toast("Signed out"); });
+
   render();
   (async () => {
     if (!window.supabase || SUPABASE_URL.includes("YOUR-PROJECT")) {
@@ -687,6 +734,9 @@ details.rules[open] summary::after { content: " –"; }
       canWrite = false; render(); return;
     }
     db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    const { data: { session } } = await db.auth.getSession();
+    applySession(session);
+    db.auth.onAuthStateChange((_e, s) => applySession(s));
     await refresh();
     let pending = null;
     const queue = () => { clearTimeout(pending); pending = setTimeout(refresh, 150); };
